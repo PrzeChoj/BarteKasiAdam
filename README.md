@@ -11,5 +11,5 @@ W celu przygotowania modeli związanych z predykcją przepływu klinetów należ
 W ramach projektu można również wytrenować swoje modele do porównania.
 
 ## Notatki:
-1. Wczytaliśmy dane za pomocą kodu z kaggle. Okazało się, że Notebook ten jest błędny - autor twierdzi, że niema braków danych, a w rzeczywistości są 2 kolumny - "Income_Category" oraz "Education_Level" - posiadające kolejno 11% oraz 15% braków danych. Stworzyliśmy więc nową kolumnę informującą o tym, czy był to brak, a oryginalne kolumny zaimputowaliśmy ich modą. W przyszłym tygodniu będziemy pracować nad wstępną analizą modelu i rozpoczniemy jego wyjaśnianie.
+1. Wczytaliśmy dane za pomocą kodu z kaggle. Okazało się, że Notebook ten jest błędny - autor twierdzi, że niema braków danych, a w rzeczywistości są 2 kolumny - "Income_Category" oraz "Education_Level" - posiadające kolejno 11% oraz 15% braków danych. Stworzyliśmy więc nową kolumnę informującą o tym, czy był to brak, a oryginalne kolumny zaimputowaliśmy ich modą. Naszym zdaniem to jest ważna informacja, że user nie podaje bankowi swoich zarobków - podejrzewamy, że wstydzi się ich z jakiegoś powodu, albo nie jest to jego główny bank. A przynajmniej tak podejrzewamy. W przyszłym tygodniu będziemy pracować nad wstępną analizą modelu i rozpoczniemy jego wyjaśnianie.
 2. 
