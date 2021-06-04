@@ -1,0 +1,98 @@
+### Methodology
+
+#### Dataset
+
+We will deliver our analysis on the data about resignation from using the credit card. The original collection contains information about 10 127 of the bank's customers. The goal of this data was to predict whether the customer decides to discontinue using a credit card. This data set consists of 19 predictors:
+
+* *Customer_Age* - Customer's Age in Years
+* *Gender* - Gender of a Customer
+* *Dependent_count* - Number of people dependant to a customer
+* *Education_Level* - Educational qualification of the account holder 
+* *Marital_Status* - Customer's Marital Status
+* *Income_Category* - Customer's Annual Income Category
+* *Card_Category* - Type of Card (Blue, Silver, Gold, Platinum)
+* *Months_on_book* - Number of months the account exists
+* *Total_Relationship_Count* - Number of bank products held by the customer
+* *Months_Inactive_12_mon* - Number of months with no transfers in the last 12 months
+* *Contacts_Count_12_mon* - Number of times the account holder contacted the bank in the last 12 months (phone, mail, visit in facility)
+* *Credit_Limit* - The maximum amount of credit that a Card owner can take
+* *Total_Revolving_Bal* - Total amount of credit that a Card owner did not pay at the end of the billing cycle
+* *Avg_Open_To_Buy* - Average of 12 months of the maximum possible amount of cash available to the account holder to spend
+* *Total_Amt_Chng_Q4_Q1* - Change in Transaction Amount between last and first quarter of the year
+* *Total_Trans_Amt* - Sum of all Transaction Amounts in last 12 months
+* *Total_Trans_Ct* - Number of all Transaction Amounts in last 12 months
+* *Total_Ct_Chng_Q4_Q1* - Change in number of Transactions between last and first quarter of the year
+* *Avg_Utilization_Ratio* - Average use of possible credit in the last 12 months TODO uspójnić wielkie i małe litery powyżej, moim zdaniem powinny być małe
+
+The target variable in the set is *Attrition_Flag*, which determines whether the customer did close its Credit Cards service. 16% of customers in Dataset decided to stop using their Cards. The other 84% will continue to be the bank's customers.
+
+```{r targetCounts, out.width="700", fig.align="center", echo=FALSE, fig.cap="Numbers of customers who decided to closed their Credit Cards service"}
+
+knitr::include_graphics('images/1-1-target-count.png')
+```
+
+
+##### Data preparation
+
+We have observed some of the columns had a giant correlation with others. Namely, *Months_on_book*, *Total_Trans_Ct* and *Credit_Limit* each had another column which it was correlated with (Pearson correlation over $0.75$). That's why we decided to drop those columns from models.
+
+Some of the data had missing values. For every such case, we imputed the missing values with a median and made a new column informing whether there was a missing value or not.
+
+For the categorial columns with order (like *Card_Category*: *Blue* < *Silver* < *Gold* < *Platinum*) we encoded it with growing numbers.
+
+For other categorical columns, we applied one-hot encoding.
+
+#### Machine learning
+
+To find the differences between tree-based models and a white-box these algorithms were selected:
+
+* *XGBoost*
+* *Random forest*
+* *Logistic Regression* with *L1* penalty
+
+The first two are commonly used, black-box, tree-based models. The last is a well known generalized linear model for classification.
+
+Tree-based models tend to be overfitting. What is more, they tend to choose 3 or 4 columns to be deeply dependent on and almost completely ignore the rest. That is why the *Logistic Regression* analyzed in this article was modified with the *L1* penalty. This modification makes a model "select" some of the predictors to predict from and the rest is ignored. It is possible to adjust the strength of a penalty with a *C* parameter. The smaller the *C*, the fewer columns are selected to be proper predictors for a model.
+
+
+#### Assumptions of Logistic Regression
+
+A *Logistic Regression* model is derived from assumptions on data. Those assumptions can be summarised by a sentence: "Probability of being in a certain class is a logit function of a linear combination of predictors". The exact assumption states: 
+
+A data has $n$ predictors. Let $x\in \mathbb{R}^n$ be a value of those predictors and $p(x)$ be a probalility that the target value is $1$ provided those values of predictors. Then there exist $\beta_0\in\mathbb{R}$ and $\beta\in\mathbb{R}^n$ that $$\log(\frac{p(x)}{1-p(x)}) = \beta_0 + \sum_{i=1}^{n}(\beta_i \cdot x_i)$$
+
+The *Logistic Regression* model finds the best fitting values of $\beta_0$ and $\beta$.
+
+In practice, this assumption states, that the best fitting line to the data shown in Figure \@ref(fig:LogReg-assumption) is well fitted and that the points arrange around it.
+
+```{r LogReg-assumption, out.width="700", fig.align="center", echo=FALSE, fig.cap='Figures showing the assumptions of Logistic Regression on some of the columns of the data'}
+
+knitr::include_graphics('images/1-1-LogReg-assumption.png')
+
+```
+
+Appropriate graphs of all of the variables can be examined on this article's GitHub repository TODO(Dodać referencje z linkiem). Those graphs look similar to the five shown in \@ref(fig:LogReg-assumption), which are:
+
+* *Total_Ct_Chng_Q4_Q1* - satisfies the assumption;
+* *Customer_Age* - looks like a data-blob;
+* *Total_Trans_Amt* - provides a more complicated dependency than a straight line;
+* *Marital_Married* - a binary column, therefore it is hard to conclude if it is well fitted or not;
+* *Contacts_Count_12_mon* - multilabel discrete column, but rightly fitted.
+
+We concluded some of the columns may be slightly inappropriate to model linearly, but overall the Assumptions of *Logistic Regression* are mostly satisfied.
+
+#### Methods of Explainable Artificial Intelligence
+
+In the article, we used some Explainable Artificial Intelligence (XAI) methods to explain models. Those methods are:
+
+1. Local methods:
+* TODO(Kasiu, dopisz swoje)
+2. Global methods:
+* Permutational Feature Importance
+* Partial Dependence Profiles (PDP)
+* Accumulated Local Effects (ALE)
+
+
+### Summary
+
+In the article we analyzed the dataset and models trained on it. We explored the differences between the black-box, tree-based models and an explainable *Logistic Regression*. Various XAI methods were used for the comparison of the ML models. Local explanations provided that ...TODO(Dopisać wnioski z wyjaśnień lokalnych). Global explanations of models gave us insight into how the models work. This lead to conclusions about the differences between those models. Firstly, tree-based models make their's predictions on 5 or 6 values while a *Logistic Regression* (despite being modified with *L1* penalty) uses more predictors. Secondly, tree-based models were overfitted on some of the columns. Lastly, with *Logistic Regression* it is impossible to model more complicated relationship in data because this method assumes linearity.
